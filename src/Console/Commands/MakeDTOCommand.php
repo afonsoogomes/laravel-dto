@@ -43,7 +43,9 @@ class MakeDTOCommand extends Command
             return;
         }
 
-        $stubPath = base_path('stubs/dto.plain.stub');
+        $publishedStubPath = base_path('stubs/dto.plain.stub');
+        $packageStubPath = __DIR__ . '/../../../stubs/dto.plain.stub';
+        $stubPath = File::exists($publishedStubPath) ? $publishedStubPath : $packageStubPath;
 
         if (!File::exists($stubPath)) {
             $this->error('Stub file does not exist.');
