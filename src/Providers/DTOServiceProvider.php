@@ -1,9 +1,9 @@
 <?php
 
-namespace AfonsoOliveira\LaravelDTO\Providers;
+namespace AfonsoOGomes\LaravelDTO\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use AfonsoOliveira\LaravelDTO\Console\Commands\MakeDTOCommand;
+use AfonsoOGomes\LaravelDTO\Console\Commands\MakeDTOCommand;
 
 class DTOServiceProvider extends ServiceProvider
 {

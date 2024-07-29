@@ -9,13 +9,13 @@
     },
     "autoload": {
         "psr-4": {
-            "AfonsoOliveira\\LaravelDTO\\": "src/"
+            "AfonsoOGomes\\LaravelDTO\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "AfonsoOliveira\\LaravelDTO\\Providers\\DTOServiceProvider"
+                "AfonsoOGomes\\LaravelDTO\\Providers\\DTOServiceProvider"
             ]
         }
     }

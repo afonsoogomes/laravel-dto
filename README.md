@@ -12,7 +12,7 @@ A Laravel library for creating and managing Data Transfer Objects (DTOs) with va
 To install the library, add it to your `composer.json` file or run the following command:
 
 ```bash
-composer require afonsooliveira/laravel-dto
+composer require afonsoogomes/laravel-dto
 ```
 
 ## Usage

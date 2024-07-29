@@ -1,6 +1,6 @@
 <?php
 
-namespace AfonsoOliveira\LaravelDTO\DTO;
+namespace AfonsoOGomes\LaravelDTO\DTO;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Collection;

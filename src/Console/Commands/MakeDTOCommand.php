@@ -1,6 +1,6 @@
 <?php
 
-namespace AfonsoOliveira\LaravelDTO\Console\Commands;
+namespace AfonsoOGomes\LaravelDTO\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
