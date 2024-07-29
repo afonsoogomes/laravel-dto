@@ -83,9 +83,9 @@ class ContactDTO extends DTO
     }
 
     protected function prepareForValidation(): array
-{
-    return [
-            'phone' => preg_replace('/\D/', '', $this->items['phone'])
+    {
+        return [
+            'phone' => preg_replace('/\D/', '', $this->phone)
         ];
     }
 }
