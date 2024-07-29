@@ -1,0 +1,22 @@
+{
+    "name": "afonsoogomes/laravel-dto",
+    "description": "A library for handling DTOs with Laravel.",
+    "type": "library",
+    "require": {
+        "php": "^7.3|^8.0",
+        "illuminate/support": "^8.0|^9.0|^10.0",
+        "illuminate/console": "^8.0|^9.0|^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AfonsoOliveira\\LaravelDTO\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AfonsoOliveira\\LaravelDTO\\Providers\\DTOServiceProvider"
+            ]
+        }
+    }
+}

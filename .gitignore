@@ -1,0 +1,56 @@
+# Laravel & PHP
+/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+/.env
+/.env.*
+/storage/debugbar
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+/storage/logs
+*.log
+
+# Composer
+composer.lock
+composer.phar
+
+# Laravel IDE Helper
+_ide_helper.php
+_ide_helper_models.php
+_ide_helper.php.cache
+.phpstorm.meta.php
+
+# PHPUnit
+phpunit.xml
+phpunit.xml.dist
+
+# Laravel Telescope
+telescope/*
+
+# Debugging & IDE
+.vscode/
+*.sublime-workspace
+*.sublime-project
+*.idea/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Mac specific
+*.DS_Store
+
+# Windows specific
+*.log
+*.tmp
+*.swp
+
+# Other
+/.vagrant/
+/Homestead.yaml
+/Homestead.json
+
+# Ignore the build artifacts
+/build/
