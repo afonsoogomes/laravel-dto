@@ -154,4 +154,4 @@ If you would like to contribute to the library, please submit a pull request on 
 
 ## License
 
-This library is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+This library is licensed under the MIT License. See the [LICENSE](https://github.com/afonsoogomes/laravel-dto/blob/main/LICENSE.md) file for more information.
