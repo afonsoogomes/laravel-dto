@@ -2,6 +2,7 @@
     "name": "afonsoogomes/laravel-dto",
     "description": "A library for handling DTOs with Laravel.",
     "type": "library",
+    "version": "1.0.1",
     "require": {
         "php": "^7.3|^8.0",
         "illuminate/support": "^8.0|^9.0|^10.0",
@@ -12,6 +13,8 @@
             "AfonsoOGomes\\LaravelDTO\\": "src/"
         }
     },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "extra": {
         "laravel": {
             "providers": [

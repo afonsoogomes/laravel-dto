@@ -48,7 +48,7 @@ abstract class DTO extends Collection
         $this->items = array_filter($items, function ($value) {
             return $value !== null;
         });
-        
+
         $transformedItems = $this->prepareForValidation();
         $mergedData = array_merge($this->items, $transformedItems);
 
