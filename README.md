@@ -34,7 +34,7 @@ Here's an example of how to use the `DTO` class:
 ```php
 namespace App\DTO;
 
-use Illuminate\Support\Facades\Validator;
+use AfonsoOGomes\LaravelDTO\DTO;
 
 class UserDTO extends DTO
 {
@@ -70,7 +70,7 @@ You can use the `prepareForValidation` method to process data before validation.
 ```php
 namespace App\DTO;
 
-use Illuminate\Support\Facades\Validator;
+use AfonsoOGomes\LaravelDTO\DTO;
 
 class ContactDTO extends DTO
 {
@@ -98,7 +98,7 @@ You can configure the DTO to remove fields that do not have validation rules:
 ```php
 namespace App\DTO;
 
-use Illuminate\Support\Facades\Validator;
+use AfonsoOGomes\LaravelDTO\DTO;
 
 class OrderDTO extends DTO
 {
