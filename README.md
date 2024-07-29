@@ -61,6 +61,60 @@ $userDTO = UserDTO::create([
 echo $userDTO->name;  // John Doe
 ```
 
+### Advanced Examples
+
+#### Using `prepareForValidation`
+
+You can use the `prepareForValidation` method to process data before validation. For example, to clean up a phone number:
+
+```php
+namespace App\DTO;
+
+use Illuminate\Support\Facades\Validator;
+
+class ContactDTO extends DTO
+{
+    protected function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'size:10'],  // Example: must be 10 digits
+        ];
+    }
+
+    protected function prepareForValidation(): array
+{
+    return [
+            'phone' => preg_replace('/\D/', '', $this->items['phone'])
+        ];
+    }
+}
+```
+
+#### Using `removeUnvalidatedFields`
+
+You can configure the DTO to remove fields that do not have validation rules:
+
+```php
+namespace App\DTO;
+
+use Illuminate\Support\Facades\Validator;
+
+class OrderDTO extends DTO
+{
+    protected $removeUnvalidatedFields = true;
+
+    protected function rules(): array
+    {
+        return [
+            'order_id' => ['required', 'string'],
+            'amount' => ['required', 'numeric'],
+            // No rule for 'notes', for example
+        ];
+    }
+}
+```
+
 ### Command Options
 
 - `name`: The name of the DTO class to be created. You can use forward slashes to create nested directories.
@@ -87,6 +141,8 @@ The DTO constructor accepts the following parameters:
 - `create(array $items = [])`: Static method to create a new DTO instance.
 - `__construct(array $items = [])`: Constructor to initialize the DTO with data and perform validation.
 - `rules()`: Method to define validation rules for the DTO. Override this method in your DTO classes.
+- `prepareForValidation()`: Method to preprocess the data before validation.
+- `removeUnvalidatedFields(array $items)`: Method to filter out fields without validation rules.
 
 ## Testing
 
