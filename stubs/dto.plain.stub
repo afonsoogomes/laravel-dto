@@ -1,0 +1,40 @@
+<?php
+
+namespace {{ namespace }};
+
+use AfonsoOGomes\LaravelDTO\DTO;
+
+class {{ class }} extends DTO
+{
+    /**
+     * Indicates whether fields that do not have validation rules should be removed.
+     *
+     * @var bool
+     */
+    protected $removeUnvalidatedFields = false;
+
+    /**
+     * Transform the data before validation.
+     *
+     * @param array $items
+     * @return array
+     */
+    protected function prepareForValidation(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    protected function rules(): array
+    {
+        return [
+            //
+        ];
+    }
+}
