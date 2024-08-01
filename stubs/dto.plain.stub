@@ -11,7 +11,7 @@ class {{ class }} extends DTO
      *
      * @var bool
      */
-    protected $whitelist = false;
+    protected $whitelist = true;
 
     /**
      * Get the validation rules that apply to the request.

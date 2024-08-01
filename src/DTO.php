@@ -33,53 +33,23 @@ abstract class DTO
     }
 
     /**
-     * Create a new DTO instance.
-     *
-     * @param array $items
-     * @return static
-     */
-    public static function create(array $items = [])
-    {
-        return new static($items);
-    }
-
-    /**
      * DTO constructor.
      *
      * @param array $items
      */
-    public function __construct($items = [])
+    public function __construct(array $items = [])
     {
-        $defaults = $this->defaults();
-        $items = array_merge($defaults, $items);
-
-        $items = array_filter($items, function ($value) {
-            return $value !== null;
-        });
-
-        $transformedItems = $this->transform();
-        $items = array_merge($items, $transformedItems);
+        $this->collection = new Collection($items);
+        $this->collection = $this->collection->merge($this->defaults());
+        $this->collection = $this->collection->merge($this->transform());
 
         if ($this->whitelist) {
-            $items = $this->applyWhitelist($items);
+            $this->collection = $this->collection->filter(function ($item, $key) {
+                return array_key_exists($key, $this->rules());
+            });
         }
 
-        $this->collection = new Collection($items);
-
         $this->validate();
-    }
-
-    /**
-     * Apply the whitelist to remove fields that are not allowed.
-     *
-     * @param \Illuminate\Support\Collection $collection
-     * @return \Illuminate\Support\Collection
-     */
-    private function applyWhitelist(array $items): array
-    {
-        return array_filter($items, function ($key) {
-            return array_key_exists($key, $this->rules());
-        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -88,20 +58,9 @@ abstract class DTO
      *
      * @return array
      */
-    private function transform(): array
+    protected function transform(): array
     {
-        return $this->items;
-    }
-
-    /**
-     * Validate the DTO data.
-     *
-     * @return void
-     */
-    private function validate()
-    {
-        $validator = Validator::make($this->collection->all(), $this->rules());
-        $validator->validate();
+        return [];
     }
 
     /**
@@ -126,6 +85,17 @@ abstract class DTO
     }
 
     /**
+     * Validate the DTO data.
+     *
+     * @return void
+     */
+    private function validate()
+    {
+        $validator = Validator::make($this->collection->all(), $this->rules());
+        $validator->validate();
+    }
+
+    /**
      * Get an item from the collection.
      *
      * @param string $key
@@ -142,7 +112,7 @@ abstract class DTO
      *
      * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->collection->all();
     }
@@ -156,6 +126,29 @@ abstract class DTO
     public function has(string $key): bool
     {
         return $this->collection->has($key);
+    }
+
+    /**
+     * Set an item in the collection.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function set(string $key, $value): void
+    {
+        $this->collection->put($key, $value);
+    }
+
+    /**
+     * Remove an item from the collection.
+     *
+     * @param string $key
+     * @return void
+     */
+    public function remove(string $key): void
+    {
+        $this->collection->forget($key);
     }
 
     /**
@@ -173,8 +166,41 @@ abstract class DTO
      *
      * @return array
      */
-    protected function toArray(): array
+    public function toArray(): array
     {
         return $this->collection->toArray();
+    }
+
+    /**
+     * Convert the collection to a JSON string.
+     *
+     * @return string
+     */
+    public function toJson(): string
+    {
+        return $this->collection->toJson();
+    }
+
+    /**
+     * Create a new DTO instance from a JSON string.
+     *
+     * @param string $json
+     * @return static
+     */
+    public static function fromJson(string $json)
+    {
+        $data = json_decode($json, true);
+        return new static($data);
+    }
+
+    /**
+     * Create a new DTO instance from an array.
+     *
+     * @param array $data
+     * @return static
+     */
+    public static function fromArray(array $data)
+    {
+        return new static($data);
     }
 }
