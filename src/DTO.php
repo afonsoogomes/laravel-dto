@@ -5,14 +5,21 @@ namespace AfonsoOGomes\LaravelDTO;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Collection;
 
-abstract class DTO extends Collection
+abstract class DTO
 {
     /**
-     * Indicates whether fields that do not have validation rules should be removed.
+     * The collection that stores the data for the DTO.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    private $collection;
+
+    /**
+     * Indicates whether to use a whitelist to allow only specific fields.
      *
      * @var bool
      */
-    protected $removeUnvalidatedFields = false;
+    protected $whitelist = false;
 
     /**
      * Magic method to get properties dynamically.
@@ -22,14 +29,13 @@ abstract class DTO extends Collection
      */
     public function __get($name)
     {
-        return $this->items[$name] ?? null;
+        return $this->collection->get($name);
     }
 
     /**
      * Create a new DTO instance.
      *
      * @param array $items
-     * @param bool $removeUnvalidatedFields
      * @return static
      */
     public static function create(array $items = [])
@@ -41,33 +47,35 @@ abstract class DTO extends Collection
      * DTO constructor.
      *
      * @param array $items
-     * @param bool $removeUnvalidatedFields
      */
     public function __construct($items = [])
     {
-        $this->items = array_filter($items, function ($value) {
+        $defaults = $this->defaults();
+        $items = array_merge($defaults, $items);
+
+        $items = array_filter($items, function ($value) {
             return $value !== null;
         });
 
-        $transformedItems = $this->prepareForValidation();
-        $mergedData = array_merge($this->items, $transformedItems);
+        $transformedItems = $this->transform();
+        $items = array_merge($items, $transformedItems);
 
-        parent::__construct($mergedData);
-
-        if ($this->removeUnvalidatedFields) {
-            $this->items = $this->removeUnvalidatedFields($this->items);
+        if ($this->whitelist) {
+            $items = $this->applyWhitelist($items);
         }
+
+        $this->collection = new Collection($items);
 
         $this->validate();
     }
 
     /**
-     * Remove fields that do not have validation rules.
+     * Apply the whitelist to remove fields that are not allowed.
      *
-     * @param array $items
-     * @return array
+     * @param \Illuminate\Support\Collection $collection
+     * @return \Illuminate\Support\Collection
      */
-    protected function removeUnvalidatedFields(array $items): array
+    private function applyWhitelist(array $items): array
     {
         return array_filter($items, function ($key) {
             return array_key_exists($key, $this->rules());
@@ -75,12 +83,12 @@ abstract class DTO extends Collection
     }
 
     /**
-     * Prepare the data for validation.
+     * Transform the data before validation.
      * This method can be overridden in the child classes to transform data before validation.
      *
      * @return array
      */
-    protected function prepareForValidation(): array
+    private function transform(): array
     {
         return $this->items;
     }
@@ -92,8 +100,19 @@ abstract class DTO extends Collection
      */
     private function validate()
     {
-        $validator = Validator::make($this->all(), $this->rules());
+        $validator = Validator::make($this->collection->all(), $this->rules());
         $validator->validate();
+    }
+
+    /**
+     * Get the default values for the DTO.
+     * This method can be overridden in the child classes to provide default values.
+     *
+     * @return array
+     */
+    protected function defaults(): array
+    {
+        return [];
     }
 
     /**
@@ -104,5 +123,58 @@ abstract class DTO extends Collection
     protected function rules(): array
     {
         return [];
+    }
+
+    /**
+     * Get an item from the collection.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function get(string $key, $default = null)
+    {
+        return $this->collection->get($key, $default);
+    }
+
+    /**
+     * Get all items from the collection.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->collection->all();
+    }
+
+    /**
+     * Check if a key exists in the collection.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return $this->collection->has($key);
+    }
+
+    /**
+     * Get the count of items in the collection.
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return $this->collection->count();
+    }
+
+    /**
+     * Convert the collection to an array.
+     *
+     * @return array
+     */
+    protected function toArray(): array
+    {
+        return $this->collection->toArray();
     }
 }

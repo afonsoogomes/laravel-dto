@@ -7,24 +7,11 @@ use AfonsoOGomes\LaravelDTO\DTO;
 class {{ class }} extends DTO
 {
     /**
-     * Indicates whether fields that do not have validation rules should be removed.
+     * Indicates whether to use a whitelist to allow only specific fields.
      *
      * @var bool
      */
-    protected $removeUnvalidatedFields = false;
-
-    /**
-     * Transform the data before validation.
-     *
-     * @param array $items
-     * @return array
-     */
-    protected function prepareForValidation(): array
-    {
-        return [
-            //
-        ];
-    }
+    protected $whitelist = false;
 
     /**
      * Get the validation rules that apply to the request.
@@ -32,6 +19,31 @@ class {{ class }} extends DTO
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     protected function rules(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Get the default values for the DTO.
+     *
+     * @return array
+     */
+    protected function defaults(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Transform the data before validation.
+     *
+     * @param array $items
+     * @return array
+     */
+    protected function transform(): array
     {
         return [
             //

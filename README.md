@@ -63,9 +63,9 @@ echo $userDTO->name;  // John Doe
 
 ### Advanced Examples
 
-#### Using `prepareForValidation`
+#### Using `transform`
 
-You can use the `prepareForValidation` method to process data before validation. For example, to clean up a phone number:
+You can use the `transform` method to process data before validation. For example, to clean up a phone number:
 
 ```php
 namespace App\DTO;
@@ -82,7 +82,7 @@ class ContactDTO extends DTO
         ];
     }
 
-    protected function prepareForValidation(): array
+    protected function transform(): array
     {
         return [
             'phone' => preg_replace('/\D/', '', $this->phone)
@@ -91,9 +91,9 @@ class ContactDTO extends DTO
 }
 ```
 
-#### Using `removeUnvalidatedFields`
+#### Using `whitelist`
 
-You can configure the DTO to remove fields that do not have validation rules:
+You can configure the DTO to use a whitelist to include only fields that are explicitly defined in the rules() method. This ensures that only validated fields are returned, filtering out any additional fields not covered by the validation rules:
 
 ```php
 namespace App\DTO;
@@ -102,7 +102,7 @@ use AfonsoOGomes\LaravelDTO\DTO;
 
 class OrderDTO extends DTO
 {
-    protected $removeUnvalidatedFields = true;
+    protected $whitelist = true;
 
     protected function rules(): array
     {
@@ -134,15 +134,20 @@ This will create a `UserProfile.php` file in the `app/DTO` directory.
 The DTO constructor accepts the following parameters:
 
 - `array $items`: The initial data for the DTO.
-- `bool $removeUnvalidatedFields`: Whether to remove fields that do not have validation rules. Default is `false`.
+- `bool $whitelist`: Whether to remove fields that do not have validation rules. Default is `false`.
 
 ### Methods
 
 - `create(array $items = [])`: Static method to create a new DTO instance.
 - `__construct(array $items = [])`: Constructor to initialize the DTO with data and perform validation.
 - `rules()`: Method to define validation rules for the DTO. Override this method in your DTO classes.
-- `prepareForValidation()`: Method to preprocess the data before validation.
-- `removeUnvalidatedFields(array $items)`: Method to filter out fields without validation rules.
+- `transform()`: Method to preprocess the data before validation.
+- `defaults()`: Method to define default values for the DTO.
+- `get($key, $default = null)`: Method to get a value from the DTO by key.
+- `all()`: Method to get all the data in the DTO.
+- `has($key)`: Method to check if a key exists in the DTO.
+- `count()`: Method to count the number of items in the DTO.
+- `toArray()`: Method to convert the DTO to an array.
 
 ## Testing
 
