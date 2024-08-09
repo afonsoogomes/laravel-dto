@@ -19,7 +19,7 @@ abstract class DTO
      *
      * @var bool
      */
-    protected $whitelist = false;
+    protected $whitelist = true;
 
     /**
      * Magic method to get properties dynamically.
@@ -40,8 +40,8 @@ abstract class DTO
     public function __construct(array $items = [])
     {
         $this->collection = new Collection($items);
-        $this->collection = $this->collection->merge($this->defaults());
-        $this->collection = $this->collection->merge($this->transform());
+        $this->collection = $this->collection->mergeRecursive($this->defaults());
+        $this->collection = $this->collection->mergeRecursive($this->transform());
 
         if ($this->whitelist) {
             $this->collection = $this->collection->filter(function ($item, $key) {
