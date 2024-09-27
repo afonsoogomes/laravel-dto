@@ -52,7 +52,19 @@ abstract class DTO
         $this->validate();
     }
 
-    public function mergeRecursive(array $array1, array $array2): array
+    /**
+     * Recursively merges two arrays, with the values of the second array overwriting
+     * the values of the first array when necessary.
+     *
+     * If both the key in the first and second arrays are arrays themselves,
+     * the function calls itself recursively to merge them.
+     * Otherwise, the value from the second array will overwrite the value in the first.
+     *
+     * @param array $array1 The base array.
+     * @param array $array2 The array whose values will overwrite those in $array1.
+     * @return array The resulting merged array.
+     */
+    protected function mergeRecursive(array $array1, array $array2): array
     {
         foreach ($array2 as $key => $value) {
             if (isset($array1[$key]) && is_array($array1[$key]) && is_array($value)) {
