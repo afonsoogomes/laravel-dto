@@ -40,8 +40,8 @@ abstract class DTO
     public function __construct(array $items = [])
     {
         $this->collection = new Collection($items);
-        $this->collection = $this->collection->mergeRecursive($this->defaults());
-        $this->collection = $this->collection->mergeRecursive($this->transform());
+        $this->collection = new Collection($this->mergeRecursive($this->collection->toArray(), $this->defaults()));
+        $this->collection = new Collection($this->mergeRecursive($this->collection->toArray(), $this->transform()));
 
         if ($this->whitelist) {
             $this->collection = $this->collection->filter(function ($item, $key) {
@@ -50,6 +50,19 @@ abstract class DTO
         }
 
         $this->validate();
+    }
+
+    public function mergeRecursive(array $array1, array $array2): array
+    {
+        foreach ($array2 as $key => $value) {
+            if (isset($array1[$key]) && is_array($array1[$key]) && is_array($value)) {
+                $array1[$key] = $this->mergeRecursive($array1[$key], $value);
+            } else {
+                $array1[$key] = $value;
+            }
+        }
+
+        return $array1;
     }
 
     /**
