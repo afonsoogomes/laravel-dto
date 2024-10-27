@@ -133,6 +133,16 @@ abstract class DTO
     }
 
     /**
+     * Get all items in the collection except for those with the specified keys.
+     *
+     * @return array
+     */
+    public function except(array $keys): array
+    {
+        return $this->collection->except($keys)->all();
+    }
+
+    /**
      * Get all items from the collection.
      *
      * @return array

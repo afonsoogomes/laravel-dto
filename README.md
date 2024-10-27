@@ -224,6 +224,7 @@ The DTO constructor accepts the following parameter:
 - `transform()`: Method to preprocess the data before validation.
 - `defaults()`: Method to define default values for the DTO.
 - `get($key, $default = null)`: Method to get a value from the DTO by key.
+- `except()`: Method to get all items in the collection except for those with the specified keys..
 - `all()`: Method to get all the data in the DTO.
 - `has($key)`: Method to check if a key exists in the DTO.
 - `set(string $key, $value)`: Method to set a value in the DTO by key.
