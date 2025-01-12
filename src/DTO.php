@@ -3,89 +3,43 @@
 namespace AfonsoOGomes\LaravelDTO;
 
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Collection;
 
 abstract class DTO
 {
     /**
-     * The collection that stores the data for the DTO.
+     * Constructs a new DTO instance with the given items and whitelist setting.
      *
-     * @var \Illuminate\Support\Collection
+     * @param array $items An associative array of data to initialize the DTO with.
+     * @param bool $whitelist Whether to only allow setting properties that are defined on the DTO class.
      */
-    private $collection;
-
-    /**
-     * Indicates whether to use a whitelist to allow only specific fields.
-     *
-     * @var bool
-     */
-    protected $whitelist = true;
-
-    /**
-     * Magic method to get properties dynamically.
-     *
-     * @param string $name
-     * @return mixed|null
-     */
-    public function __get($name)
+    private function __construct(array $items = [], bool $whitelist = false)
     {
-        return $this->collection->get($name);
-    }
+        $defaultItems = $this->defaults();
+        foreach ($defaultItems as $key => $item) {
+            $this->set($key, $item, $whitelist);
+        }
 
-    /**
-     * DTO constructor.
-     *
-     * @param array $items
-     */
-    public function __construct(array $items = [])
-    {
-        $this->collection = new Collection($items);
-        $this->collection = new Collection($this->mergeRecursive($this->collection->toArray(), $this->defaults()));
-        $this->collection = new Collection($this->mergeRecursive($this->collection->toArray(), $this->transform()));
+        foreach ($items as $key => $item) {
+            $this->set($key, $item, $whitelist);
+        }
 
-        if ($this->whitelist) {
-            $this->collection = $this->collection->filter(function ($item, $key) {
-                return array_key_exists($key, $this->rules());
-            });
+        $transformItems = $this->transform();
+        foreach ($transformItems as $key => $item) {
+            $this->set($key, $item, $whitelist);
         }
 
         $this->validate();
     }
 
     /**
-     * Recursively merges two arrays, with the values of the second array overwriting
-     * the values of the first array when necessary.
+     * Create a new DTO instance
      *
-     * If both the key in the first and second arrays are arrays themselves,
-     * the function calls itself recursively to merge them.
-     * Otherwise, the value from the second array will overwrite the value in the first.
-     *
-     * @param array $array1 The base array.
-     * @param array $array2 The array whose values will overwrite those in $array1.
-     * @return array The resulting merged array.
+     * @param array $data
+     * @return static
      */
-    protected function mergeRecursive(array $array1, array $array2): array
+    public static function make(array $data, bool $whitelist = false)
     {
-        foreach ($array2 as $key => $value) {
-            if (isset($array1[$key]) && is_array($array1[$key]) && is_array($value)) {
-                $array1[$key] = $this->mergeRecursive($array1[$key], $value);
-            } else {
-                $array1[$key] = $value;
-            }
-        }
-
-        return $array1;
-    }
-
-    /**
-     * Transform the data before validation.
-     * This method can be overridden in the child classes to transform data before validation.
-     *
-     * @return array
-     */
-    protected function transform(): array
-    {
-        return [];
+        return new static($data, $whitelist);
     }
 
     /**
@@ -95,6 +49,17 @@ abstract class DTO
      * @return array
      */
     protected function defaults(): array
+    {
+        return [];
+    }
+
+    /**
+     * Transform the data before validation.
+     * This method can be overridden in the child classes to transform data before validation.
+     *
+     * @return array
+     */
+    protected function transform(): array
     {
         return [];
     }
@@ -110,14 +75,42 @@ abstract class DTO
     }
 
     /**
+     * Get the validation error messages for the DTO.
+     *
+     * @return array
+     */
+    protected function messages(): array
+    {
+        return [];
+    }
+
+    /**
      * Validate the DTO data.
      *
      * @return void
      */
     private function validate()
     {
-        $validator = Validator::make($this->collection->all(), $this->rules());
+        $validator = Validator::make(get_object_vars($this), $this->rules(), $this->messages());
         $validator->validate();
+    }
+
+    /**
+     * Sets a property on the DTO object.
+     *
+     * @param string $key The name of the property to set.
+     * @param mixed $value The value to set for the property.
+     * @param bool $whitelist Whether to only allow setting properties that are defined on the DTO class.
+     */
+    private function set(string $key, $value, $whitelist)
+    {
+        if ($whitelist) {
+            if (!in_array($key, array_keys(get_object_vars($this)))) {
+                return;
+            }
+        }
+
+        $this->{$key} = $value;
     }
 
     /**
@@ -129,7 +122,17 @@ abstract class DTO
      */
     public function get(string $key, $default = null)
     {
-        return $this->collection->get($key, $default);
+        return collect(get_object_vars($this))->get($key, $default);;
+    }
+
+    /**
+     * Get only the specified keys from the collection.
+     *
+     * @return array
+     */
+    public function only(array $keys): array
+    {
+        return collect(get_object_vars($this))->only($keys)->all();
     }
 
     /**
@@ -139,7 +142,7 @@ abstract class DTO
      */
     public function except(array $keys): array
     {
-        return $this->collection->except($keys)->all();
+        return collect(get_object_vars($this))->except($keys)->all();
     }
 
     /**
@@ -149,7 +152,7 @@ abstract class DTO
      */
     public function all(): array
     {
-        return $this->collection->all();
+        return get_object_vars($this);
     }
 
     /**
@@ -160,30 +163,7 @@ abstract class DTO
      */
     public function has(string $key): bool
     {
-        return $this->collection->has($key);
-    }
-
-    /**
-     * Set an item in the collection.
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return void
-     */
-    public function set(string $key, $value): void
-    {
-        $this->collection->put($key, $value);
-    }
-
-    /**
-     * Remove an item from the collection.
-     *
-     * @param string $key
-     * @return void
-     */
-    public function remove(string $key): void
-    {
-        $this->collection->forget($key);
+        return isset($this->{$key});
     }
 
     /**
@@ -193,7 +173,7 @@ abstract class DTO
      */
     public function count(): int
     {
-        return $this->collection->count();
+        return count(get_object_vars($this));
     }
 
     /**
@@ -203,7 +183,7 @@ abstract class DTO
      */
     public function toArray(): array
     {
-        return $this->collection->toArray();
+        return $this->all();
     }
 
     /**
@@ -213,29 +193,6 @@ abstract class DTO
      */
     public function toJson(): string
     {
-        return $this->collection->toJson();
-    }
-
-    /**
-     * Create a new DTO instance from a JSON string.
-     *
-     * @param string $json
-     * @return static
-     */
-    public static function fromJson(string $json)
-    {
-        $data = json_decode($json, true);
-        return new static($data);
-    }
-
-    /**
-     * Create a new DTO instance from an array.
-     *
-     * @param array $data
-     * @return static
-     */
-    public static function fromArray(array $data)
-    {
-        return new static($data);
+        return json_encode($this->toArray());
     }
 }
