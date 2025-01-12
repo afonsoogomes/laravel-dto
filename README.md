@@ -38,6 +38,16 @@ use AfonsoOGomes\LaravelDTO\DTO;
 
 class UserDTO extends DTO
 {
+    /**
+     * @var string
+     */
+    public $name;
+
+    /**
+     * @var string
+     */
+    public $email;
+
     protected function rules(): array
     {
         return [
@@ -53,7 +63,7 @@ class UserDTO extends DTO
 You can create an instance of the DTO and access its properties like so:
 
 ```php
-$userDTO = new UserDTO([
+$userDTO = UserDTO::make([
     'name' => 'John Doe',
     'email' => 'john.doe@example.com',
 ]);
@@ -74,6 +84,21 @@ use AfonsoOGomes\LaravelDTO\DTO;
 
 class ProductDTO extends DTO
 {
+    /**
+     * @var string
+     */
+    public $name;
+
+    /**
+     * @var float
+     */
+    public $price;
+
+    /**
+     * @var integer
+     */
+    public $stock;
+
     protected function rules(): array
     {
         return [
@@ -98,7 +123,7 @@ $data = [
     'price' => 19.99,
 ];
 
-$productDTO = new ProductDTO($data);
+$productDTO = ProductDTO::make($data);
 
 echo $productDTO->name;  // Product Name
 echo $productDTO->price; // 19.99
@@ -116,6 +141,21 @@ use AfonsoOGomes\LaravelDTO\DTO;
 
 class UserDTO extends DTO
 {
+    /**
+     * @var string
+     */
+    public $name;
+
+    /**
+     * @var string
+     */
+    public $email;
+
+    /**
+     * @var string
+     */
+    public $phone;
+
     protected function rules(): array
     {
         return [
@@ -141,7 +181,7 @@ $data = [
     'phone' => '(123) 456-7890', // Original format
 ];
 
-$userDTO = new UserDTO($data);
+$userDTO = UserDTO::make($data);
 
 echo $userDTO->name;   // John Doe
 echo $userDTO->email;  // john.doe@example.com
@@ -159,6 +199,21 @@ use AfonsoOGomes\LaravelDTO\DTO;
 
 class OrderDTO extends DTO
 {
+    /**
+     * @var string
+     */
+    public $order_id;
+
+    /**
+     * @var float
+     */
+    public $amount;
+
+    /**
+     * @var string
+     */
+    public $currency;
+
     protected function rules(): array
     {
         return [
@@ -190,11 +245,79 @@ $data = [
     'amount' => 99.99,
 ];
 
-$orderDTO = new OrderDTO($data);
+$orderDTO = OrderDTO::make($data);
 
 echo $orderDTO->order_id; // ABC123 (transformed to uppercase)
 echo $orderDTO->amount;   // 99.99
 echo $orderDTO->currency; // USD (default value)
+```
+
+#### Whitelist
+
+
+The `whitelist` parameter allows you to restrict the DTO to only accept properties that are explicitly defined in the class. When set to `true`, any properties in the input data that are not defined as class properties will be ignored. Here's an example:
+
+```php
+namespace App\DTO;
+
+use AfonsoOGomes\LaravelDTO\DTO;
+
+class OrderDTO extends DTO
+{
+    /**
+     * @var string
+     */
+    public $order_id;
+
+    /**
+     * @var float
+     */
+    public $amount;
+
+    /**
+     * @var string
+     */
+    public $currency;
+
+    protected function rules(): array
+    {
+        return [
+            'order_id' => ['required', 'string'],
+            'amount' => ['required', 'numeric'],
+            'currency' => ['required', 'string', 'size:3'], // Example: 3-letter currency code
+        ];
+    }
+
+    protected function defaults(): array
+    {
+        return [
+            'currency' => 'USD', // Default currency value
+        ];
+    }
+
+    protected function transform(): array
+    {
+        return [
+            'order_id' => strtoupper($this->order_id), // Transform order ID to uppercase
+        ];
+    }
+}
+
+// Using the DTO with default values and data transformation
+
+$data = [
+    'order_id' => 'abc123',
+    'amount' => 99.99,
+    'unknown_field' => 'this will be ignored'
+];
+
+// Whitelist is set to true as the second parameter
+$orderDTO = OrderDTO::make($data, true);
+
+// Only defined properties are set
+echo $orderDTO->order_id;  // abc123
+echo $orderDTO->amount; // 99.99
+echo $orderDTO->unknown_field; // undefined
 ```
 
 ### Command Options
@@ -221,19 +344,20 @@ The DTO constructor accepts the following parameter:
 
 - `__construct(array $items = [])`: Constructor to initialize the DTO with data and perform validation.
 - `rules()`: Method to define validation rules for the DTO. Override this method in your DTO classes.
+- `messages()`: Get the validation error messages for the DTO.
 - `transform()`: Method to preprocess the data before validation.
 - `defaults()`: Method to define default values for the DTO.
 - `get($key, $default = null)`: Method to get a value from the DTO by key.
-- `except()`: Method to get all items in the collection except for those with the specified keys..
+- `only(array $keys)`: * Get only the specified keys from the collection.
+- `except(array $keys)`: Method to get all items in the collection except for those with the specified keys..
 - `all()`: Method to get all the data in the DTO.
-- `has($key)`: Method to check if a key exists in the DTO.
+- `has(string $key)`: Method to check if a key exists in the DTO.
 - `set(string $key, $value)`: Method to set a value in the DTO by key.
 - `remove(string $key)`: Method to remove a value from the DTO by key.
 - `count()`: Method to count the number of items in the DTO.
 - `toArray()`: Method to convert the DTO to an array.
 - `toJson()`: Method to convert the DTO to a JSON string.
-- `fromJson(string $json)`: Static method to create a new DTO instance from a JSON string.
-- `fromArray(array $data)`: Static method to create a new DTO instance from an array.
+- `make(array $data)`: Static method to create a new DTO instance from an array.
 
 ## Testing
 
